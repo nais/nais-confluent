@@ -1,0 +1,20 @@
+{{- if and .Values.rest_proxy.enabled .Values.rest_proxy.ingress.enabled -}}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  labels:
+    app: {{ template "confluent.name" . }}
+    component: "{{ .Values.rest_proxy.name }}"
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+  name: {{ template "confluent.rest_proxy.fullname" . }}
+spec:
+  rules:
+    - host: {{ .Values.rest_proxy.ingress.host }}
+      http:
+        paths:
+          - backend:
+              serviceName: {{ template "confluent.rest_proxy.fullname" . }}
+              servicePort: {{ .Values.rest_proxy.port }}
+{{- end -}}

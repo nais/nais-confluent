@@ -1,0 +1,9 @@
+apiVersion: v1
+name: nais-confluent
+description: NAIS confluent services
+version: 1.0.0
+sources:
+  - https://github.com/nais/nais-confluent
+maintainers:
+  - name: Terje Sannum
+    email: terje.sannum@nav.no

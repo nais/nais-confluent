@@ -1,0 +1,20 @@
+{{- if and .Values.schema_registry.enabled .Values.schema_registry.ingress.enabled -}}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  labels:
+    app: {{ template "confluent.name" . }}
+    component: "{{ .Values.schema_registry.name }}"
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+  name: {{ template "confluent.schema_registry.fullname" . }}
+spec:
+  rules:
+    - host: {{ .Values.schema_registry.ingress.host }}
+      http:
+        paths:
+          - backend:
+              serviceName: {{ template "confluent.schema_registry.fullname" . }}
+              servicePort: {{ .Values.schema_registry.port }}
+{{- end -}}

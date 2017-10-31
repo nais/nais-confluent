@@ -1,0 +1,22 @@
+{{- if .Values.schema_registry.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ template "confluent.name" . }}
+    component: "{{ .Values.schema_registry.name }}"
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+  name: {{ template "confluent.schema_registry.fullname" . }}
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ template "confluent.name" . }}
+    component: "{{ .Values.schema_registry.name }}"
+    release: {{ .Release.Name }}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.schema_registry.port }}
+      targetPort: {{ .Values.schema_registry.port }}
+{{- end -}}

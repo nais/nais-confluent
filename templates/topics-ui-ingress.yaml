@@ -1,0 +1,20 @@
+{{- if and .Values.topics_ui.enabled .Values.topics_ui.ingress.enabled -}}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  labels:
+        app: {{ template "confluent.name" . }}
+        component: "{{ .Values.topics_ui.name }}"
+        chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+        heritage: {{ .Release.Service }}
+        release: {{ .Release.Name }}
+  name: {{ template "confluent.topics_ui.fullname" . }}
+spec:
+  rules:
+    - host: {{ .Values.topics_ui.ingress.host }}
+      http:
+        paths:
+          - backend:
+              serviceName: {{ template "confluent.topics_ui.fullname" . }}
+              servicePort: 8000
+{{- end -}}

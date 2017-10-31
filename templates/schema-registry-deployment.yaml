@@ -1,0 +1,33 @@
+{{- if .Values.schema_registry.enabled -}}
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "confluent.schema_registry.fullname" . }}
+spec:
+  template:
+    metadata:
+    {{- if .Values.schema_registry.podAnnotations }}
+      annotations:
+{{ toYaml .Values.schema_registry.podAnnotations | indent 8 }}
+    {{- end }}
+      labels:
+        app: {{ template "confluent.name" . }}
+        component: "{{ .Values.schema_registry.name }}"
+        chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+        heritage: {{ .Release.Service }}
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: {{ template "confluent.name" . }}-{{ .Values.schema_registry.name }}
+        image: "{{ .Values.schema_registry.image.repository }}:{{ .Values.schema_registry.image.tag }}"
+        env:
+          - name: SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL
+            value: {{ range $i,$zookeeper := .Values.zookeeper }}{{if $i}},{{end}}{{ $zookeeper.host }}:{{ $zookeeper.port }}{{ end }}
+          - name: SCHEMA_REGISTRY_HOST_NAME
+            value: {{ template "confluent.schema_registry.fullname" . }}
+          - name: SCHEMA_REGISTRY_LISTENERS
+            value: "http://0.0.0.0:{{ .Values.schema_registry.port }}"
+        ports:
+          - containerPort: {{ .Values.schema_registry.port }}
+            protocol: TCP
+{{- end -}}

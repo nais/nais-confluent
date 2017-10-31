@@ -1,0 +1,31 @@
+{{- if .Values.topics_ui.enabled -}}
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "confluent.topics_ui.fullname" . }}
+spec:
+  template:
+    metadata:
+    {{- if .Values.topics_ui.podAnnotations }}
+      annotations:
+{{ toYaml .Values.topics_ui.podAnnotations | indent 8 }}
+    {{- end }}
+      labels:
+        app: {{ template "confluent.name" . }}
+        component: "{{ .Values.topics_ui.name }}"
+        chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+        heritage: {{ .Release.Service }}
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: {{ template "confluent.name" . }}-{{ .Values.topics_ui.name }}
+        image: "{{ .Values.topics_ui.image.repository }}:{{ .Values.topics_ui.image.tag }}"
+        env:
+          - name: KAFKA_REST_PROXY_URL
+            value: http://{{ template "confluent.rest_proxy.fullname" . }}:{{ .Values.rest_proxy.port }}
+          - name: PROXY
+            value: "{{ .Values.topics_ui.proxy }}"
+        ports:
+          - containerPort: {{ .Values.topics_ui.port }}
+            protocol: TCP
+{{- end -}}
