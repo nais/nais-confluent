@@ -20,6 +20,12 @@ spec:
       containers:
       - name: {{ template "confluent.name" . }}-{{ .Values.rest_proxy.name }}
         image: "{{ .Values.rest_proxy.image.repository }}:{{ .Values.rest_proxy.image.tag }}"
+        {{- if .Values.truststore }}
+        volumeMounts:
+        - name: keystores
+          mountPath: "/etc/keystores"
+          readOnly: true
+        {{- end }}
         env:
           - name: KAFKA_REST_ZOOKEEPER_CONNECT
             value: {{ range $i,$zookeeper := .Values.zookeeper }}{{if $i}},{{end}}{{ $zookeeper.host }}:{{ $zookeeper.port }}{{ end }}
@@ -30,8 +36,28 @@ spec:
           - name: KAFKA_REST_LISTENERS
             value: "http://0.0.0.0:{{ .Values.rest_proxy.port }}"
           - name: KAFKA_REST_BOOTSTRAP_SERVERS
-            value: {{ range $i,$broker := .Values.broker }}{{if $i}},{{end}}PLAINTEXT://{{ $broker.host }}:{{ $broker.port }}{{ end }}
+            value: {{ range $i,$broker := .Values.broker }}{{if $i}},{{end}}{{ $broker.protocol }}://{{ $broker.host }}:{{ $broker.port }}{{ end }}
+          - name: KAFKA_REST_CLIENT_ZOOKEEPER_CONNECT
+            value: {{ range $i,$zookeeper := .Values.zookeeper }}{{if $i}},{{end}}{{ $zookeeper.host }}:{{ $zookeeper.port }}{{ end }}
+          - name: KAFKA_REST_CLIENT_BOOTSTRAP_SERVERS
+            value: {{ range $i,$broker := .Values.broker }}{{if $i}},{{end}}{{ $broker.protocol }}://{{ $broker.host }}:{{ $broker.port }}{{ end }}
+          - name: KAFKA_REST_CLIENT_SECURITY_PROTOCOL
+            value: SSL
+          {{- if .Values.truststore }}
+          - name: KAFKA_REST_CLIENT_SSL_TRUSTSTORE_LOCATION
+            value: "/etc/keystores/truststore"
+          {{- if .Values.truststore.password }}
+          - name: KAFKA_REST_CLIENT_SSL_TRUSTSTORE_PASSWORD
+            value: {{ .Values.truststore.password }}
+          {{- end }}
+          {{- end }}
         ports:
           - containerPort: {{ .Values.rest_proxy.port }}
             protocol: TCP
+      {{- if .Values.truststore }}
+      volumes:
+      - name: keystores
+        secret:
+          secretName: {{ template "confluent.fullname" . }}
+      {{- end }}
 {{- end -}}

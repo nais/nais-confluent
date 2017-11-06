@@ -1,10 +1,13 @@
 zookeeper:
   - host: zookeeper1.kafka.local
     port: 2181
+    protocol: PLAINTEXT
   - host: zookeeper2.kafka.local
     port: 2181
+    protocol: PLAINTEXT
   - host: zookeeper3.kafka.local
     port: 2181
+    protocol: PLAINTEXT
 broker:
   - host: broker1.kafka.local
     port: 9092
@@ -12,6 +15,11 @@ broker:
     port: 9092
   - host: broker3.kafka.local
     port: 9092
+
+# truststore:
+#   # optional base64 encoded jks truststore when using SSL (create base64 encoded string with 'base64 -w0')
+#   jks: ...
+#   password: ...
 
 schema_registry:
   enabled: true
@@ -23,6 +31,7 @@ schema_registry:
   ingress:
     enabled: true
     host: kafka-schema-registry.nais.local
+  security_protocol: PLAINTEXT
 
 rest_proxy:
   enabled: true
@@ -34,6 +43,7 @@ rest_proxy:
   ingress:
     enabled: true
     host: kafka-rest-proxy.nais.local
+  security_protocol: PLAINTEXT
 
 topics_ui:
   enabled: true
