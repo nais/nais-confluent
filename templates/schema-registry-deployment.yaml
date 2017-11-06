@@ -32,7 +32,7 @@ spec:
           - name: SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS
             value: {{ range $i,$broker := .Values.broker }}{{if $i}},{{end}}{{ $broker.protocol }}://{{ $broker.host }}:{{ $broker.port }}{{ end }}
           - name: SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL
-            value: SSL
+            value: {{ .Values.schema_registry.security_protocol }}
           - name: SCHEMA_REGISTRY_HOST_NAME
             value: {{ template "confluent.schema_registry.fullname" . }}
           - name: SCHEMA_REGISTRY_LISTENERS

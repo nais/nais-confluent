@@ -42,7 +42,7 @@ spec:
           - name: KAFKA_REST_CLIENT_BOOTSTRAP_SERVERS
             value: {{ range $i,$broker := .Values.broker }}{{if $i}},{{end}}{{ $broker.protocol }}://{{ $broker.host }}:{{ $broker.port }}{{ end }}
           - name: KAFKA_REST_CLIENT_SECURITY_PROTOCOL
-            value: SSL
+            value: {{ .Values.rest_proxy.security_protocol }}
           {{- if .Values.truststore }}
           - name: KAFKA_REST_CLIENT_SSL_TRUSTSTORE_LOCATION
             value: "/etc/keystores/truststore"
