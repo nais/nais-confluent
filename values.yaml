@@ -1,20 +1,20 @@
 zookeeper:
   - host: zookeeper1.kafka.local
     port: 2181
-    protocol: PLAINTEXT
   - host: zookeeper2.kafka.local
     port: 2181
-    protocol: PLAINTEXT
   - host: zookeeper3.kafka.local
     port: 2181
-    protocol: PLAINTEXT
 broker:
   - host: broker1.kafka.local
     port: 9092
+    protocol: PLAINTEXT
   - host: broker2.kafka.local
     port: 9092
+    protocol: PLAINTEXT
   - host: broker3.kafka.local
     port: 9092
+    protocol: PLAINTEXT
 
 # truststore:
 #   # optional base64 encoded jks truststore when using SSL (create base64 encoded string with 'base64 -w0')
