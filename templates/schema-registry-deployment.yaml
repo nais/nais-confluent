@@ -20,10 +20,10 @@ spec:
       containers:
       - name: {{ template "confluent.name" . }}-{{ .Values.schema_registry.name }}
         image: "{{ .Values.schema_registry.image.repository }}:{{ .Values.schema_registry.image.tag }}"
-        {{- if .Values.truststore.jks }}
+        {{- if or .Values.jaasConfig .Values.truststore }}
         volumeMounts:
-        - name: keystores
-          mountPath: "/etc/keystores"
+        - name: security
+          mountPath: "/etc/kafka-security"
           readOnly: true
         {{- end }}
         env:
@@ -37,20 +37,30 @@ spec:
             value: {{ template "confluent.schema_registry.fullname" . }}
           - name: SCHEMA_REGISTRY_LISTENERS
             value: "http://0.0.0.0:{{ .Values.schema_registry.port }}"
+          {{- if .Values.schema_registry.sasl_mechanism }}
+          - name: SCHEMA_REGISTRY_KAFKASTORE_SASL_MECHANISM
+            value: {{ .Values.schema_registry.sasl_mechanism }}
+          {{- end }}
           {{- if .Values.truststore.jks }}
           - name: SCHEMA_REGISTRY_KAFKASTORE_SSL_TRUSTSTORE_LOCATION
-            value: "/etc/keystores/truststore"
+            value: "/etc/kafka-security/truststore"
           {{- if .Values.truststore.password }}
           - name: SCHEMA_REGISTRY_KAFKASTORE_SSL_TRUSTSTORE_PASSWORD
             value: {{ .Values.truststore.password }}
           {{- end }}
           {{- end }}
+          {{- if .Values.jaasConfig }}
+          - name: KAFKA_OPTS
+            value: "-Djava.security.auth.login.config=/etc/kafka-security/jaasConfig"
+          - name: SCHEMA_REGISTRY_OPTS
+            value: "-Djava.security.auth.login.config=/etc/kafka-security/jaasConfig"
+          {{- end }}
         ports:
           - containerPort: {{ .Values.schema_registry.port }}
             protocol: TCP
-      {{- if .Values.truststore }}
+      {{- if or .Values.jaasConfig .Values.truststore }}
       volumes:
-      - name: keystores
+      - name: security
         secret:
           secretName: {{ template "confluent.fullname" . }}
       {{- end }}

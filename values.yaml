@@ -21,13 +21,16 @@ broker:
 #   jks: ...
 #   password: ...
 
+# # optional base64 encoded jaas config (create base64 encoded string with 'base64 -w0')
+# jaasConfig: ...
+
 schema_registry:
   enabled: true
   name: schema-registry
   port: 8081
   image:
     repository: confluentinc/cp-schema-registry
-    tag: 3.3.0
+    tag: 4.0.0
   ingress:
     enabled: true
     host: kafka-schema-registry.nais.local
@@ -39,22 +42,9 @@ rest_proxy:
   port: 8082
   image:
     repository: confluentinc/cp-kafka-rest
-    tag: 3.3.0
+    tag: 4.0.0
   ingress:
     enabled: true
     host: kafka-rest-proxy.nais.local
   security_protocol: PLAINTEXT
 
-topics_ui:
-  enabled: true
-  name: topics-ui
-  port: 8000
-  proxy: true
-  podAnnotations:
-    nais.io/logformat: accesslog
-  image:
-    repository: landoop/kafka-topics-ui
-    tag: 0.9.3
-  ingress:
-    enabled: true
-    host: kafka-topics-ui.nais.local

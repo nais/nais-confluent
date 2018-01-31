@@ -20,10 +20,10 @@ spec:
       containers:
       - name: {{ template "confluent.name" . }}-{{ .Values.rest_proxy.name }}
         image: "{{ .Values.rest_proxy.image.repository }}:{{ .Values.rest_proxy.image.tag }}"
-        {{- if .Values.truststore }}
+        {{- if or .Values.jaasConfig .Values.truststore }}
         volumeMounts:
-        - name: keystores
-          mountPath: "/etc/keystores"
+        - name: security
+          mountPath: "/etc/kafka-security"
           readOnly: true
         {{- end }}
         env:
@@ -43,20 +43,30 @@ spec:
             value: {{ range $i,$broker := .Values.broker }}{{if $i}},{{end}}{{ $broker.protocol }}://{{ $broker.host }}:{{ $broker.port }}{{ end }}
           - name: KAFKA_REST_CLIENT_SECURITY_PROTOCOL
             value: {{ .Values.rest_proxy.security_protocol }}
+          {{- if .Values.rest_proxy.sasl_mechanism }}
+          - name: KAFKA_REST_CLIENT_SASL_MECHANISM
+            value: {{ .Values.rest_proxy.sasl_mechanism }}
+          {{- end }}
           {{- if .Values.truststore }}
           - name: KAFKA_REST_CLIENT_SSL_TRUSTSTORE_LOCATION
-            value: "/etc/keystores/truststore"
+            value: "/etc/kafka-security/truststore"
           {{- if .Values.truststore.password }}
           - name: KAFKA_REST_CLIENT_SSL_TRUSTSTORE_PASSWORD
             value: {{ .Values.truststore.password }}
           {{- end }}
           {{- end }}
+          {{- if .Values.jaasConfig }}
+          - name: KAFKA_OPTS
+            value: "-Djava.security.auth.login.config=/etc/kafka-security/jaasConfig"
+          - name: KAFKAREST_OPTS
+            value: "-Djava.security.auth.login.config=/etc/kafka-security/jaasConfig"
+          {{- end }}
         ports:
           - containerPort: {{ .Values.rest_proxy.port }}
             protocol: TCP
-      {{- if .Values.truststore }}
+      {{- if or .Values.jaasConfig .Values.truststore }}
       volumes:
-      - name: keystores
+      - name: security
         secret:
           secretName: {{ template "confluent.fullname" . }}
       {{- end }}
