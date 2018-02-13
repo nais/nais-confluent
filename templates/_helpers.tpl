@@ -11,6 +11,14 @@
 {{- end -}}
 {{- end -}}
 
+{{- define "confluent.schema_registry.servicename" -}}
+{{- if .Values.schema_registry.service_name -}}
+{{- .Values.schema_registry.service_name -}}
+{{- else -}}
+{{- template "confluent.schema_registry.fullname" . -}}
+{{- end -}}
+{{- end -}}
+
 {{- define "confluent.schema_registry.fullname" -}}
 {{- $name := default .Chart.Name .Values.nameOverride -}}
 {{- if ne $name .Release.Name -}}
@@ -20,12 +28,11 @@
 {{- end -}}
 {{- end -}}
 
-{{- define "confluent.topics_ui.fullname" -}}
-{{- $name := default .Chart.Name .Values.nameOverride -}}
-{{- if ne $name .Release.Name -}}
-{{- printf "%s-%s-%s" .Release.Name $name .Values.topics_ui.name | trunc 63 | trimSuffix "-" -}}
+{{- define "confluent.rest_proxy.servicename" -}}
+{{- if .Values.rest_proxy.service_name -}}
+{{- .Values.rest_proxy.service_name -}}
 {{- else -}}
-{{- printf "%s-%s" $name .Values.topics_ui.name | trunc 63 | trimSuffix "-" -}}
+{{- template "confluent.rest_proxy.fullname" . -}}
 {{- end -}}
 {{- end -}}
 

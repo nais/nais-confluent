@@ -41,12 +41,14 @@ spec:
           - name: SCHEMA_REGISTRY_KAFKASTORE_SASL_MECHANISM
             value: {{ .Values.schema_registry.sasl_mechanism }}
           {{- end }}
+          {{- if .Values.truststore }}
           {{- if .Values.truststore.jks }}
           - name: SCHEMA_REGISTRY_KAFKASTORE_SSL_TRUSTSTORE_LOCATION
             value: "/etc/kafka-security/truststore"
           {{- if .Values.truststore.password }}
           - name: SCHEMA_REGISTRY_KAFKASTORE_SSL_TRUSTSTORE_PASSWORD
             value: {{ .Values.truststore.password }}
+          {{- end }}
           {{- end }}
           {{- end }}
           {{- if .Values.jaasConfig }}

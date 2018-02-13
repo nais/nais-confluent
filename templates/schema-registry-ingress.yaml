@@ -15,6 +15,6 @@ spec:
       http:
         paths:
           - backend:
-              serviceName: {{ template "confluent.schema_registry.fullname" . }}
+              serviceName: {{ template "confluent.schema_registry.servicename" . }}
               servicePort: {{ .Values.schema_registry.port }}
 {{- end -}}

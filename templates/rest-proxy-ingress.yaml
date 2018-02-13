@@ -15,6 +15,6 @@ spec:
       http:
         paths:
           - backend:
-              serviceName: {{ template "confluent.rest_proxy.fullname" . }}
+              serviceName: {{ template "confluent.rest_proxy.servicename" . }}
               servicePort: {{ .Values.rest_proxy.port }}
 {{- end -}}
