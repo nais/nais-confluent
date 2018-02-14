@@ -3,6 +3,12 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: {{ template "confluent.rest_proxy.fullname" . }}
+  labels:
+    app: {{ template "confluent.name" . }}
+    component: "{{ .Values.rest_proxy.name }}"
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
 spec:
   template:
     metadata:
@@ -13,8 +19,6 @@ spec:
       labels:
         app: {{ template "confluent.name" . }}
         component: "{{ .Values.rest_proxy.name }}"
-        chart: {{ .Chart.Name }}-{{ .Chart.Version }}
-        heritage: {{ .Release.Service }}
         release: {{ .Release.Name }}
     spec:
       containers:
