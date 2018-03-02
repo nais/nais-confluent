@@ -63,6 +63,8 @@ spec:
           {{- end }}
           - name: SCHEMA_REGISTRY_KAFKASTORE_TOPIC_REPLICATION_FACTOR
             value: "{{ .Values.schema_registry.replication_factor }}"
+          - name: SCHEMA_REGISTRY_ZOOKEEPER_SET_ACL
+            value: "{{ .Values.schema_registry.zookeeper_set_acl }}"
         ports:
           - containerPort: {{ .Values.schema_registry.port }}
             protocol: TCP
