@@ -61,6 +61,8 @@ spec:
           - name: SCHEMA_REGISTRY_OPTS
             value: "-Djava.security.auth.login.config=/etc/kafka-security/jaasConfig"
           {{- end }}
+          - name: SCHEMA_REGISTRY_KAFKASTORE_TOPIC_REPLICATION_FACTOR
+            value: "{{ .Values.schema_registry.replication_factor }}"
         ports:
           - containerPort: {{ .Values.schema_registry.port }}
             protocol: TCP

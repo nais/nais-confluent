@@ -35,6 +35,7 @@ schema_registry:
     enabled: true
     host: kafka-schema-registry.nais.local
   security_protocol: PLAINTEXT
+  replication_factor: 3
 
 rest_proxy:
   enabled: true
