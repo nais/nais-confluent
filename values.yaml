@@ -28,6 +28,8 @@ schema_registry:
   enabled: true
   name: schema-registry
   port: 8081
+  replicas: 1
+  master_eligibility: true
   image:
     repository: confluentinc/cp-schema-registry
     tag: 4.0.0
@@ -42,6 +44,7 @@ rest_proxy:
   enabled: true
   name: rest-proxy
   port: 8082
+  replicas: 1
   image:
     repository: confluentinc/cp-kafka-rest
     tag: 4.0.0

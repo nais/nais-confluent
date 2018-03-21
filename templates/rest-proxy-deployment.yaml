@@ -10,6 +10,7 @@ metadata:
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
 spec:
+  replicas: {{ .Values.rest_proxy.replicas }}
   template:
     metadata:
     {{- if .Values.rest_proxy.podAnnotations }}

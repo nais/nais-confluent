@@ -10,6 +10,7 @@ metadata:
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
 spec:
+  replicas: {{ .Values.schema_registry.replicas }}
   template:
     metadata:
     {{- if .Values.schema_registry.podAnnotations }}
@@ -38,7 +39,9 @@ spec:
           - name: SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL
             value: {{ .Values.schema_registry.security_protocol }}
           - name: SCHEMA_REGISTRY_HOST_NAME
-            value: {{ template "confluent.schema_registry.servicename" . }}
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
           - name: SCHEMA_REGISTRY_LISTENERS
             value: "http://0.0.0.0:{{ .Values.schema_registry.port }}"
           {{- if .Values.schema_registry.sasl_mechanism }}
@@ -65,6 +68,8 @@ spec:
             value: "{{ .Values.schema_registry.replication_factor }}"
           - name: SCHEMA_REGISTRY_ZOOKEEPER_SET_ACL
             value: "{{ .Values.schema_registry.zookeeper_set_acl }}"
+          - name: SCHEMA_REGISTRY_MASTER_ELIGIBILITY
+            value: "{{ .Values.schema_registry.master_eligibility }}"
         ports:
           - containerPort: {{ .Values.schema_registry.port }}
             protocol: TCP
