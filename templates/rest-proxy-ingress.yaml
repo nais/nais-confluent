@@ -19,4 +19,5 @@ spec:
           - backend:
               serviceName: {{ template "confluent.rest_proxy.servicename" $root }}
               servicePort: {{ $root.Values.rest_proxy.port }}
+{{- end }}
 {{- end -}}
