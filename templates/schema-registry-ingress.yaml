@@ -11,10 +11,13 @@ metadata:
   name: {{ template "confluent.schema_registry.fullname" . }}
 spec:
   rules:
-    - host: {{ .Values.schema_registry.ingress.host }}
+{{- $root := . -}}
+{{- range $host := .Values.schema_registry.ingress.host }}
+    - host: {{ $host }}
       http:
         paths:
           - backend:
-              serviceName: {{ template "confluent.schema_registry.servicename" . }}
-              servicePort: {{ .Values.schema_registry.port }}
+              serviceName: {{ template "confluent.schema_registry.servicename" $root }}
+              servicePort: {{ $root.Values.schema_registry.port }}
+{{- end }}
 {{- end -}}

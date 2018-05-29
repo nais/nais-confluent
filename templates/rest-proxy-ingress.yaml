@@ -11,10 +11,12 @@ metadata:
   name: {{ template "confluent.rest_proxy.fullname" . }}
 spec:
   rules:
-    - host: {{ .Values.rest_proxy.ingress.host }}
+{{- $root := . -}}
+{{- range $host := .Values.rest_proxy.ingress.host }}
+    - host: {{ $host }}
       http:
         paths:
           - backend:
-              serviceName: {{ template "confluent.rest_proxy.servicename" . }}
-              servicePort: {{ .Values.rest_proxy.port }}
+              serviceName: {{ template "confluent.rest_proxy.servicename" $root }}
+              servicePort: {{ $root.Values.rest_proxy.port }}
 {{- end -}}

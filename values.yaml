@@ -35,7 +35,8 @@ schema_registry:
     tag: 4.0.0
   ingress:
     enabled: true
-    host: kafka-schema-registry.nais.local
+    host:
+      - kafka-schema-registry.nais.local
   security_protocol: PLAINTEXT
   replication_factor: 3
   zookeeper_set_acl: false
@@ -50,6 +51,7 @@ rest_proxy:
     tag: 4.0.0
   ingress:
     enabled: true
-    host: kafka-rest-proxy.nais.local
+    host:
+      - kafka-rest-proxy.nais.local
   security_protocol: PLAINTEXT
 
