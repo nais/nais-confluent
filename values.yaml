@@ -32,7 +32,7 @@ schema_registry:
   master_eligibility: true
   image:
     repository: confluentinc/cp-schema-registry
-    tag: 4.0.0
+    tag: 5.0.0
   ingress:
     enabled: true
     host:
@@ -48,7 +48,7 @@ rest_proxy:
   replicas: 1
   image:
     repository: confluentinc/cp-kafka-rest
-    tag: 4.0.0
+    tag: 5.0.0
   ingress:
     enabled: true
     host:

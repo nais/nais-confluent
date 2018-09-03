@@ -41,7 +41,7 @@ spec:
           - name: SCHEMA_REGISTRY_HOST_NAME
             valueFrom:
               fieldRef:
-                fieldPath: status.podIP
+                fieldPath: metadata.name
           - name: SCHEMA_REGISTRY_LISTENERS
             value: "http://0.0.0.0:{{ .Values.schema_registry.port }}"
           {{- if .Values.schema_registry.sasl_mechanism }}
