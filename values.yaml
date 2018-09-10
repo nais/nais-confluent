@@ -30,6 +30,7 @@ schema_registry:
   port: 8081
   replicas: 1
   master_eligibility: true
+  group_id: schema-registry
   image:
     repository: confluentinc/cp-schema-registry
     tag: 5.0.0

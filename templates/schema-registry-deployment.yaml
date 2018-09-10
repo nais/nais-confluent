@@ -32,8 +32,6 @@ spec:
           readOnly: true
         {{- end }}
         env:
-          - name: SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL
-            value: {{ range $i,$zookeeper := .Values.zookeeper }}{{if $i}},{{end}}{{ $zookeeper.host }}:{{ $zookeeper.port }}{{ end }}
           - name: SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS
             value: {{ range $i,$broker := .Values.broker }}{{if $i}},{{end}}{{ $broker.protocol }}://{{ $broker.host }}:{{ $broker.port }}{{ end }}
           - name: SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL
@@ -66,10 +64,10 @@ spec:
           {{- end }}
           - name: SCHEMA_REGISTRY_KAFKASTORE_TOPIC_REPLICATION_FACTOR
             value: "{{ .Values.schema_registry.replication_factor }}"
-          - name: SCHEMA_REGISTRY_ZOOKEEPER_SET_ACL
-            value: "{{ .Values.schema_registry.zookeeper_set_acl }}"
           - name: SCHEMA_REGISTRY_MASTER_ELIGIBILITY
             value: "{{ .Values.schema_registry.master_eligibility }}"
+          - name: SCHEMA_REGISTRY_GROUP_ID
+            value: "{{ .Values.schema_registry.group_id }}"
         ports:
           - containerPort: {{ .Values.schema_registry.port }}
             protocol: TCP
