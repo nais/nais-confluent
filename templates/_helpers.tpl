@@ -19,6 +19,14 @@
 {{- end -}}
 {{- end -}}
 
+{{- define "confluent.schema_registry.serviceaccountname" -}}
+{{- if .Values.schema_registry.serviceaccount_name -}}
+{{- .Values.schema_registry.serviceaccount_name -}}
+{{- else -}}
+{{- template "confluent.schema_registry.fullname" . -}}
+{{- end -}}
+{{- end -}}
+
 {{- define "confluent.schema_registry.fullname" -}}
 {{- $name := default .Chart.Name .Values.nameOverride -}}
 {{- if ne $name .Release.Name -}}

@@ -1,5 +1,5 @@
 {{- if .Values.schema_registry.enabled -}}
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ template "confluent.schema_registry.fullname" . }}
@@ -11,26 +11,58 @@ metadata:
     release: {{ .Release.Name }}
 spec:
   replicas: {{ .Values.schema_registry.replicas }}
+  selector:
+    matchLabels:
+      app: {{ template "confluent.name" . }}
+      component: "{{ .Values.schema_registry.name }}"
+      release: {{ .Release.Name }}
   template:
     metadata:
-    {{- if .Values.schema_registry.podAnnotations }}
+{{- if .Values.schema_registry.podAnnotations }}
       annotations:
 {{ toYaml .Values.schema_registry.podAnnotations | indent 8 }}
-    {{- end }}
+{{- end }}
       labels:
         app: {{ template "confluent.name" . }}
         component: "{{ .Values.schema_registry.name }}"
         release: {{ .Release.Name }}
     spec:
+      serviceAccountName: {{ template "confluent.schema_registry.serviceaccountname" . }}
+{{- if .Values.schema_registry.vault_init.enabled }}
+      initContainers:
+      - name: vks
+        image: "{{ .Values.schema_registry.vault_init.image.repository }}:{{ .Values.schema_registry.vault_init.image.tag }}"
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: VKS_VAULT_ADDR
+          value: {{ .Values.schema_registry.vault_init.vks.vault_addr }}
+        - name: VKS_AUTH_PATH
+          value: {{ .Values.schema_registry.vault_init.vks.auth_path }}
+        - name: VKS_KV_PATH
+          value: {{ .Values.schema_registry.vault_init.vks.kv_path }}
+        - name: VKS_VAULT_ROLE
+          value: {{ .Values.schema_registry.vault_init.vks.vault_role }}
+        - name: VKS_SECRET_DEST_PATH
+          value: {{ .Values.schema_registry.vault_init.vks.secret_dest_path }}
+        volumeMounts:
+        - mountPath: {{ .Values.schema_registry.vault_init.vks.secret_dest_path }}
+          name: vault-secrets
+{{- end }}
       containers:
       - name: {{ template "confluent.name" . }}-{{ .Values.schema_registry.name }}
         image: "{{ .Values.schema_registry.image.repository }}:{{ .Values.schema_registry.image.tag }}"
-        {{- if or .Values.jaasConfig .Values.truststore }}
+{{- if or .Values.schema_registry.vault_init.enabled .Values.truststore }}
         volumeMounts:
+{{- if .Values.schema_registry.vault_init.enabled }}
+        - mountPath: {{ .Values.schema_registry.vault_init.vks.secret_dest_path }}
+          name: vault-secrets
+{{- end }}
+{{- if .Values.truststore }}
         - name: security
           mountPath: "/etc/kafka-security"
           readOnly: true
-        {{- end }}
+{{- end }}
+{{- end }}
         env:
           - name: SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS
             value: {{ range $i,$broker := .Values.broker }}{{if $i}},{{end}}{{ $broker.protocol }}://{{ $broker.host }}:{{ $broker.port }}{{ end }}
@@ -42,10 +74,10 @@ spec:
                 fieldPath: metadata.name
           - name: SCHEMA_REGISTRY_LISTENERS
             value: "http://0.0.0.0:{{ .Values.schema_registry.port }}"
-          {{- if .Values.schema_registry.sasl_mechanism }}
+{{- if .Values.schema_registry.sasl_mechanism }}
           - name: SCHEMA_REGISTRY_KAFKASTORE_SASL_MECHANISM
             value: {{ .Values.schema_registry.sasl_mechanism }}
-          {{- end }}
+{{- end }}
           {{- if .Values.truststore }}
           {{- if .Values.truststore.jks }}
           - name: SCHEMA_REGISTRY_KAFKASTORE_SSL_TRUSTSTORE_LOCATION
@@ -62,6 +94,12 @@ spec:
           - name: SCHEMA_REGISTRY_OPTS
             value: "-Djava.security.auth.login.config=/etc/kafka-security/jaasConfig"
           {{- end }}
+          {{- if .Values.schema_registry.vault_init.enabled }}
+          - name: KAFKA_OPTS
+            value: "-Djava.security.auth.login.config={{ .Values.schema_registry.vault_init.vks.secret_dest_path }}/jaasConfig"
+          - name: SCHEMA_REGISTRY_OPTS
+            value: "-Djava.security.auth.login.config={{ .Values.schema_registry.vault_init.vks.secret_dest_path }}/jaasConfig"
+          {{- end }}
           - name: SCHEMA_REGISTRY_KAFKASTORE_TOPIC_REPLICATION_FACTOR
             value: "{{ .Values.schema_registry.replication_factor }}"
           - name: SCHEMA_REGISTRY_MASTER_ELIGIBILITY
@@ -71,10 +109,17 @@ spec:
         ports:
           - containerPort: {{ .Values.schema_registry.port }}
             protocol: TCP
-      {{- if or .Values.jaasConfig .Values.truststore }}
+{{- if or .Values.schema_registry.vault_init.enabled .Values.truststore }}
       volumes:
+{{- if .Values.schema_registry.vault_init.enabled }}
+      - emptyDir:
+          medium: Memory
+        name: vault-secrets
+{{- end }}
+{{- if .Values.truststore }}
       - name: security
         secret:
           secretName: {{ template "confluent.fullname" . }}
-      {{- end }}
+{{- end }}
+{{- end }}
 {{- end -}}

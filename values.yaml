@@ -1,10 +1,3 @@
-zookeeper:
-  - host: zookeeper1.kafka.local
-    port: 2181
-  - host: zookeeper2.kafka.local
-    port: 2181
-  - host: zookeeper3.kafka.local
-    port: 2181
 broker:
   - host: broker1.kafka.local
     port: 9092
@@ -16,8 +9,8 @@ broker:
     port: 9092
     protocol: PLAINTEXT
 
+# # optional base64 encoded jks truststore when using SSL (create base64 encoded string with 'base64 -w0')
 # truststore:
-#   # optional base64 encoded jks truststore when using SSL (create base64 encoded string with 'base64 -w0')
 #   jks: ...
 #   password: ...
 
@@ -40,19 +33,19 @@ schema_registry:
       - kafka-schema-registry.nais.local
   security_protocol: PLAINTEXT
   replication_factor: 3
-  zookeeper_set_acl: false
+  vault_init:
+    enabled: false
 
-rest_proxy:
-  enabled: true
-  name: rest-proxy
-  port: 8082
-  replicas: 1
-  image:
-    repository: confluentinc/cp-kafka-rest
-    tag: 5.0.0
-  ingress:
-    enabled: true
-    host:
-      - kafka-rest-proxy.nais.local
-  security_protocol: PLAINTEXT
+# # optional init container to get jaas config from vault
+# vault_init:
+#   enabled: true
+#   image:
+#     repository: navikt/vks
+#     tag: 21
+#   vks:
+#     vault_addr: "https://vault.adeo.no"
+#     auth_path: /kubernetes/nais
+#     kv_path: /kv/nais/confluent-schema-registry/default
+#     vault_role: confluent-schema-registry
+#     secret_dest_path: /var/run/secrets/naisd.io/vault
 
