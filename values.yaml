@@ -33,19 +33,16 @@ schema_registry:
       - kafka-schema-registry.nais.local
   security_protocol: PLAINTEXT
   replication_factor: 3
+# # optional init container to get jaas config from vault
   vault_init:
     enabled: false
-
-# # optional init container to get jaas config from vault
-# vault_init:
-#   enabled: true
-#   image:
-#     repository: navikt/vks
-#     tag: 21
-#   vks:
-#     vault_addr: "https://vault.adeo.no"
-#     auth_path: /kubernetes/nais
-#     kv_path: /kv/nais/confluent-schema-registry/default
-#     vault_role: confluent-schema-registry
-#     secret_dest_path: /var/run/secrets/naisd.io/vault
+    image:
+      repository: navikt/vks
+      tag: 21
+    vks:
+      vault_addr: https://vault.nais.local
+      auth_path: /kubernetes/nais
+      kv_path: /kv/nais/confluent-schema-registry/default
+      vault_role: confluent-schema-registry
+      secret_dest_path: /var/run/secrets/naisd.io/vault
 
