@@ -1,3 +1,5 @@
+team: kafka
+
 broker:
   - host: broker1.kafka.local
     port: 9092

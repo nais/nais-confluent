@@ -9,6 +9,7 @@ metadata:
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
+    team: {{ .Values.team }}
 spec:
   replicas: {{ .Values.schema_registry.replicas }}
   selector:
@@ -26,6 +27,7 @@ spec:
         app: {{ template "confluent.name" . }}
         component: "{{ .Values.schema_registry.name }}"
         release: {{ .Release.Name }}
+        team: {{ .Values.team }}
     spec:
       serviceAccountName: {{ template "confluent.schema_registry.serviceaccountname" . }}
 {{- if .Values.schema_registry.vault_init.enabled }}
