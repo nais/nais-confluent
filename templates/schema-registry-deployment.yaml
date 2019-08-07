@@ -111,6 +111,12 @@ spec:
         ports:
           - containerPort: {{ .Values.schema_registry.port }}
             protocol: TCP
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["all"]
+          runAsNonRoot: true
+          runAsUser: {{ .Values.runAsUser }}
 {{- if or .Values.schema_registry.vault_init.enabled .Values.truststore }}
       volumes:
 {{- if .Values.schema_registry.vault_init.enabled }}
